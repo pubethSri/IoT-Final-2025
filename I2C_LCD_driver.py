@@ -1,14 +1,11 @@
-# Python library for I2C LCD driver
-# Source: https://gist.github.com/gilyes/4a33604f1a4e1564f9f143715cddf08a
-
 import smbus
 import time
 
-class I2C_LCD_driver:
-    # Define some device constants
-    I2C_ADDR_DEFAULT = 0x27  # Default I2C Address
-    LCD_WIDTH = 16   # Maximum characters per line
+# --- Global Constants ---
+I2C_ADDR_DEFAULT = 0x27  # Default I2C Address
+LCD_WIDTH_DEFAULT = 16   # Default characters per line
 
+class I2C_LCD_driver:
     # Define some device constants
     LCD_CHR = 1 # Mode - Sending data
     LCD_CMD = 0 # Mode - Sending command
@@ -28,12 +25,12 @@ class I2C_LCD_driver:
     E_DELAY = 0.0005
 
     #Open I2C interface
-    def __init__(self, i2c_addr=I2C_ADDR_DEFAULT, i2c_bus=1, width=LCD_WIDTH):
+    def __init__(self, i2c_addr=I2C_ADDR_DEFAULT, i2c_bus=1, width=LCD_WIDTH_DEFAULT):
         self.bus = smbus.SMBus(i2c_bus)
         self.addr = i2c_addr
         self.width = width
         self.backlight = LCD_BACKLIGHT_ON
-
+        
         self.lcd_device_init()
 
     def lcd_device_init(self):
@@ -48,10 +45,6 @@ class I2C_LCD_driver:
 
     def lcd_byte(self, bits, mode):
         # Send byte to data pins
-        # bits = the data
-        # mode = 1 for data
-        #        0 for command
-
         bits_high = mode | (bits & 0xF0) | self.backlight
         bits_low = mode | ((bits<<4) & 0xF0) | self.backlight
 
@@ -94,7 +87,8 @@ class I2C_LCD_driver:
 if __name__ == '__main__':
     # Test code
     try:
-        mylcd = I2C_LCD_driver(I2C_ADDR_DEFAULT) # Use default address
+        # Use the global constant
+        mylcd = I2C_LCD_driver(i2c_addr=I2C_ADDR_DEFAULT)
         print("Writing to display...")
         mylcd.lcd_string("Hello World!", LCD_LINE_1)
         mylcd.lcd_string("Raspberry Pi", LCD_LINE_2)
@@ -105,8 +99,11 @@ if __name__ == '__main__':
         print("Test complete.")
     except KeyboardInterrupt:
         print("Cleaning up!")
-        mylcd.lcd_clear()
-        mylcd.set_backlight(False)
+        if 'mylcd' in locals():
+            mylcd.lcd_clear()
+            mylcd.set_backlight(False)
     except IOError:
+        # Use the global constant
         print("Error: Could not find LCD at address 0x{0:X}.".format(I2C_ADDR_DEFAULT))
         print("Check wiring and run 'sudo i2cdetect -y 1'.")
+        print("Or, edit I2C_ADDR_DEFAULT in this file.")
