@@ -100,4 +100,17 @@ if __name__ == '__main__':
         # --- FIXES WERE HERE (Use 'mylcd.' to access constants) ---
         mylcd.lcd_string("Hello World!", mylcd.LCD_LINE_1)
         mylcd.lcd_string("Raspberry Pi", mylcd.LCD_LINE_2)
-        time.sleep(3
+        time.sleep(3)
+        mylcd.lcd_clear()
+        mylcd.lcd_string("I2C LCD Test", mylcd.LCD_LINE_1)
+        mylcd.lcd_string("Success!", mylcd.LCD_LINE_2)
+        print("Test complete.")
+    except KeyboardInterrupt:
+        print("Cleaning up!")
+        if 'mylcd' in locals():
+            mylcd.lcd_clear()
+            mylcd.set_backlight(False)
+    except IOError:
+        print("Error: Could not find LCD at address 0x{0:X}.".format(I2C_ADDR_DEFAULT))
+        print("Check wiring and run 'sudo i2cdetect -y 1'.")
+        print("Or, edit I2C_ADDR_DEFAULT in this file.")
