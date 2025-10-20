@@ -29,19 +29,21 @@ class I2C_LCD_driver:
         self.bus = smbus.SMBus(i2c_bus)
         self.addr = i2c_addr
         self.width = width
-        self.backlight = LCD_BACKLIGHT_ON
+        # --- FIX WAS HERE ---
+        self.backlight = self.LCD_BACKLIGHT_ON
         
         self.lcd_device_init()
 
     def lcd_device_init(self):
         # Initialise display
-        self.lcd_byte(0x33, LCD_CMD) # 110011 Initialise
-        self.lcd_byte(0x32, LCD_CMD) # 110010 Initialise
-        self.lcd_byte(0x06, LCD_CMD) # 000110 Cursor move direction
-        self.lcd_byte(0x0C, LCD_CMD) # 001100 Display On,Cursor Off, Blink Off 
-        self.lcd_byte(0x28, LCD_CMD) # 101000 Data length, number of lines, font size
-        self.lcd_byte(0x01, LCD_CMD) # 000001 Clear display
-        time.sleep(E_DELAY)
+        # --- FIXES WERE HERE ---
+        self.lcd_byte(0x33, self.LCD_CMD) # 110011 Initialise
+        self.lcd_byte(0x32, self.LCD_CMD) # 110010 Initialise
+        self.lcd_byte(0x06, self.LCD_CMD) # 000110 Cursor move direction
+        self.lcd_byte(0x0C, self.LCD_CMD) # 001100 Display On,Cursor Off, Blink Off 
+        self.lcd_byte(0x28, self.LCD_CMD) # 101000 Data length, number of lines, font size
+        self.lcd_byte(0x01, self.LCD_CMD) # 000001 Clear display
+        time.sleep(self.E_DELAY)
 
     def lcd_byte(self, bits, mode):
         # Send byte to data pins
@@ -58,31 +60,36 @@ class I2C_LCD_driver:
 
     def lcd_toggle_enable(self, bits):
         # Toggle enable
-        time.sleep(E_DELAY)
-        self.bus.write_byte(self.addr, (bits | ENABLE))
-        time.sleep(E_PULSE)
-        self.bus.write_byte(self.addr,(bits & ~ENABLE))
-        time.sleep(E_DELAY)
+        time.sleep(self.E_DELAY)
+        # --- FIXES WERE HERE ---
+        self.bus.write_byte(self.addr, (bits | self.ENABLE))
+        time.sleep(self.E_PULSE)
+        self.bus.write_byte(self.addr,(bits & ~self.ENABLE))
+        time.sleep(self.E_DELAY)
 
     def lcd_string(self, message, line):
         # Send string to display
         message = message.ljust(self.width," ")
-        self.lcd_byte(line, LCD_CMD)
+        # --- FIXES WERE HERE ---
+        self.lcd_byte(line, self.LCD_CMD)
         for i in range(self.width):
-            self.lcd_byte(ord(message[i]), LCD_CHR)
+            self.lcd_byte(ord(message[i]), self.LCD_CHR)
 
     def lcd_clear(self):
         # Clear display
-        self.lcd_byte(0x01, LCD_CMD)
-        time.sleep(E_DELAY)
+        # --- FIX WAS HERE ---
+        self.lcd_byte(0x01, self.LCD_CMD)
+        time.sleep(self.E_DELAY)
 
     def set_backlight(self, state):
         # state is True for on, False for off
         if state:
-            self.backlight = LCD_BACKLIGHT_ON
+            # --- FIXES WERE HERE ---
+            self.backlight = self.LCD_BACKLIGHT_ON
         else:
-            self.backlight = LCD_BACKLIGHT_OFF
-        self.lcd_byte(0x00, LCD_CMD) # Send a dummy command to update backlight
+            self.backlight = self.LCD_BACKLIGHT_OFF
+        # --- FIX WAS HERE ---
+        self.lcd_byte(0x00, self.LCD_CMD) # Send a dummy command to update backlight
 
 if __name__ == '__main__':
     # Test code
@@ -90,20 +97,7 @@ if __name__ == '__main__':
         # Use the global constant
         mylcd = I2C_LCD_driver(i2c_addr=I2C_ADDR_DEFAULT)
         print("Writing to display...")
-        mylcd.lcd_string("Hello World!", LCD_LINE_1)
-        mylcd.lcd_string("Raspberry Pi", LCD_LINE_2)
-        time.sleep(3)
-        mylcd.lcd_clear()
-        mylcd.lcd_string("I2C LCD Test", LCD_LINE_1)
-        mylcd.lcd_string("Success!", LCD_LINE_2)
-        print("Test complete.")
-    except KeyboardInterrupt:
-        print("Cleaning up!")
-        if 'mylcd' in locals():
-            mylcd.lcd_clear()
-            mylcd.set_backlight(False)
-    except IOError:
-        # Use the global constant
-        print("Error: Could not find LCD at address 0x{0:X}.".format(I2C_ADDR_DEFAULT))
-        print("Check wiring and run 'sudo i2cdetect -y 1'.")
-        print("Or, edit I2C_ADDR_DEFAULT in this file.")
+        # --- FIXES WERE HERE (Use 'mylcd.' to access constants) ---
+        mylcd.lcd_string("Hello World!", mylcd.LCD_LINE_1)
+        mylcd.lcd_string("Raspberry Pi", mylcd.LCD_LINE_2)
+        time.sleep(3
