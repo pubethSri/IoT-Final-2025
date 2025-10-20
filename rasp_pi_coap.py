@@ -8,7 +8,7 @@ from time import sleep
 
 # --- Import CoAP libraries ---
 from aiocoap import *
-from aiocoap.resource import Resource
+from aiocoap.resource import Resource, Site
 
 # --- Initialize the LCD ---
 # !!! IMPORTANT: Set your LCD's I2C Address here !!!
@@ -64,7 +64,7 @@ class SensorDataResource(Resource):
 # --- Main function to start the server ---
 async def main():
     # Create a root resource and add our sensor resource to it
-    root = Resource()
+    root = Site()
     root.add_resource(['sensor-data'], SensorDataResource())
 
     print("Starting CoAP server...")
