@@ -32,12 +32,12 @@ class SensorDataResource(Resource):
         # Handle GET requests (Pi sends data)
         return Message(payload=self.content)
 
-    async def render_post(self, request):
+    async def render_put(self, request):
         # --- This is the important part! ---
-        # It runs when the Arduino 'POSTS' data to us
+        # It runs when the Arduino 'PUTS' data to us
         
         payload_str = request.payload.decode('utf-8')
-        print(f"Received POST request with payload: {payload_str}")
+        print(f"Received PUT request with payload: {payload_str}")
 
         try:
             # 1. Parse the JSON data from the payload
